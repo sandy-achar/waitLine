@@ -34,4 +34,4 @@ class Line(models.Model):
     prof_id = models.ForeignKey(Professor, to_field='prof_id')
 
     def __str__(self):
-        return str(self.prof_id) + " : " + str(self.student_id)
+        return str(self.position) + " - " + str(self.prof_id) + " : " + str(self.student_id)
