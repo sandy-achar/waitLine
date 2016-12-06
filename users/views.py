@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from .models import Student, Professor, Line
-import jsonpickle
 
 """
 I am using this as the place to create APIs. Sorry, I have used only Flask to create APIs :(.
@@ -29,29 +28,37 @@ class Return:
         self.professors = professors
 
 
+def health_check(request):
+    """
+    Health check for the service.
+    :return: True
+    """
+    return JsonResponse({'health': 'true'})
+
+
+def get_student_list(prof):
+    """
+    Get a list of all the students waiting in the queue for a professor.
+    :param prof: Name of the professor.
+    :return: String containing all the students waiting.
+    """
+    all_students_line = Line.objects.filter(prof_name=prof)
+    students = []
+    # Get all the student names and fill the prof object
+    for i in all_students_line:
+        students.append(i.student_name.student_name)
+
+    return ",".join(students)
+
+
 def prof_list(request, prof):
     """
     Get the JSON string of all the students for all the professors.
     :param prof_name: Name of the professor
     :return: Json string
     """
-    # Get all the professors
-    profs = Professor.objects.filter(prof_name=prof)
-    professors = []
-    for i in profs:
-        professors.append(Prof(i.prof_name))
-
-    for i in professors:
-        all_students_line = Line.objects.filter(prof_name=i.prof_name)
-
-        # Get all the student names and fill the prof object
-        for j in all_students_line:
-            i.add_student(j.student_name)
-
-    # Now we should have a json with all the prof-student relationship
-    return_object = Return(professors)
-    data = jsonpickle.encode(return_object)
-    return JsonResponse(data, safe=False)
+    students = get_student_list(prof)
+    return JsonResponse({'students': students})
 
 
 def add_to_list(request, prof, student, id):
@@ -72,23 +79,8 @@ def add_to_list(request, prof, student, id):
         add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
         add_to_line.save()
 
-    # Get all the professors
-    profs = Professor.objects.all()
-    professors = []
-    for i in profs:
-        professors.append(Prof(i.prof_name))
-
-    for i in professors:
-        all_students_line = Line.objects.filter(prof_name=i.prof_name)
-
-        # Get all the student names and fill the prof object
-        for j in all_students_line:
-            i.add_student(j.student_name)
-
-    # Now we should have a json with all the prof-student relationship
-    return_object = Return(professors)
-    data = jsonpickle.encode(return_object)
-    return JsonResponse(data, safe=False)
+    students = get_student_list(prof)
+    return JsonResponse({'students': students})
 
 
 def delete_from_list(request, prof, student):
@@ -101,20 +93,5 @@ def delete_from_list(request, prof, student):
     # Remove student from the queue.
     Line.objects.filter(student_name=student, prof_name=prof).delete()
 
-    # Get all the professors
-    profs = Professor.objects.all()
-    professors = []
-    for i in profs:
-        professors.append(Prof(i.prof_name))
-
-    for i in professors:
-        all_students_line = Line.objects.filter(prof_name=i.prof_name)
-
-        # Get all the student names and fill the prof object
-        for j in all_students_line:
-            i.add_student(j.student_name)
-
-    # Now we should have a json with all the prof-student relationship
-    return_object = Return(professors)
-    data = jsonpickle.encode(return_object)
-    return JsonResponse(data, safe=False)
+    students = get_student_list(prof)
+    return JsonResponse({'students': students})
