@@ -28,14 +28,6 @@ class Return:
         self.professors = professors
 
 
-def health_check(request):
-    """
-    Health check for the service.
-    :return: True
-    """
-    return JsonResponse({'health': 'true'})
-
-
 def get_student_list(prof):
     """
     Get a list of all the students waiting in the queue for a professor.
@@ -51,14 +43,43 @@ def get_student_list(prof):
     return ",".join(students)
 
 
+def get_prof_list():
+    """
+    Get a list of all the professors.
+    :return: String containing all the professors.
+    """
+    all_profs = Professor.objects.all()
+    profs = []
+    # Get all the student names and fill the prof object
+    for i in all_profs:
+        profs.append(i.prof_name)
+
+    return ",".join(profs)
+
+
+def professors(request):
+    """
+    Return a list of all the professors in the system currently.
+    :return: List of all the professors.
+    """
+    return JsonResponse({'professor': get_prof_list()})
+
+
+def health_check(request):
+    """
+    Health check for the service.
+    :return: True
+    """
+    return JsonResponse({'health': 'true'})
+
+
 def prof_list(request, prof):
     """
     Get the JSON string of all the students for all the professors.
     :param prof_name: Name of the professor
     :return: Json string
     """
-    students = get_student_list(prof)
-    return JsonResponse({'students': students})
+    return JsonResponse({'students': get_student_list(prof)})
 
 
 def add_to_list(request, prof, student, id):
@@ -79,8 +100,7 @@ def add_to_list(request, prof, student, id):
         add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
         add_to_line.save()
 
-    students = get_student_list(prof)
-    return JsonResponse({'students': students})
+    return JsonResponse({'students': get_student_list(prof)})
 
 
 def delete_from_list(request, prof, student):
@@ -92,6 +112,6 @@ def delete_from_list(request, prof, student):
 
     # Remove student from the queue.
     Line.objects.filter(student_name=student, prof_name=prof).delete()
-
-    students = get_student_list(prof)
-    return JsonResponse({'students': students})
+    Student.objects.filter(student_name=student).delete()
+    Professor.objects.filter(prof_name=prof).delete()
+    return JsonResponse({'students': get_student_list(prof)})
