@@ -29,6 +29,31 @@ class Return:
         self.professors = professors
 
 
+def prof_list(request, prof):
+    """
+    Get the JSON string of all the students for all the professors.
+    :param prof_name: Name of the professor
+    :return: Json string
+    """
+    # Get all the professors
+    profs = Professor.objects.filter(prof_name=prof)
+    professors = []
+    for i in profs:
+        professors.append(Prof(i.prof_name))
+
+    for i in professors:
+        all_students_line = Line.objects.filter(prof_name=i.prof_name)
+
+        # Get all the student names and fill the prof object
+        for j in all_students_line:
+            i.add_student(j.student_name)
+
+    # Now we should have a json with all the prof-student relationship
+    return_object = Return(professors)
+    data = jsonpickle.encode(return_object)
+    return JsonResponse(data, safe=False)
+
+
 def add_to_list(request, prof, student, id):
     """
     Api to add student to waiting list.
@@ -43,8 +68,38 @@ def add_to_list(request, prof, student, id):
     idiot_student = Student.objects.get(student_name=student, mav_id=id)
     prof_name = Professor.objects.get(prof_name=prof)
 
-    add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
-    add_to_line.save()
+    if Line.objects.filter(student_name=idiot_student, prof_name=prof_name).count() == 0:
+        add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
+        add_to_line.save()
+
+    # Get all the professors
+    profs = Professor.objects.all()
+    professors = []
+    for i in profs:
+        professors.append(Prof(i.prof_name))
+
+    for i in professors:
+        all_students_line = Line.objects.filter(prof_name=i.prof_name)
+
+        # Get all the student names and fill the prof object
+        for j in all_students_line:
+            i.add_student(j.student_name)
+
+    # Now we should have a json with all the prof-student relationship
+    return_object = Return(professors)
+    data = jsonpickle.encode(return_object)
+    return JsonResponse(data, safe=False)
+
+
+def delete_from_list(request, prof, student):
+    """
+    Api to add student to waiting list.
+    :param request: The request object.
+    :return: The return object.
+    """
+
+    # Remove student from the queue.
+    Line.objects.filter(student_name=student, prof_name=prof).delete()
 
     # Get all the professors
     profs = Professor.objects.all()
