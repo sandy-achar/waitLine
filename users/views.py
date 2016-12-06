@@ -36,9 +36,11 @@ def get_student_list(prof):
     """
     all_students_line = Line.objects.filter(prof_name=prof)
     students = []
+    count = 1
     # Get all the student names and fill the prof object
     for i in all_students_line:
-        students.append(i.student_name.student_name)
+        students.append(str(count) + "." + i.student_name.student_name)
+        count += 1
 
     return ",".join(students)
 
@@ -79,7 +81,7 @@ def prof_list(request, prof):
     :param prof_name: Name of the professor
     :return: Json string
     """
-    return JsonResponse({'students': get_student_list(prof)})
+    return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
 
 
 def add_to_list(request, prof, student, id):
@@ -100,7 +102,7 @@ def add_to_list(request, prof, student, id):
         add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
         add_to_line.save()
 
-    return JsonResponse({'students': get_student_list(prof)})
+        return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
 
 
 def delete_from_list(request, prof, student):
@@ -119,4 +121,4 @@ def delete_from_list(request, prof, student):
     if Line.objects.filter(prof_name=prof).count() == 0:
         Professor.objects.filter(prof_name=prof).delete()
 
-    return JsonResponse({'students': get_student_list(prof)})
+        return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
