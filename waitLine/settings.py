@@ -25,7 +25,7 @@ SECRET_KEY = 'h*6k4=9fx%m^v-bja-j*+9**6!o5m_a1o^2d_b4w=#ralg)!si'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['knronos.pythonanywhere.com', 'localhost',]
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
