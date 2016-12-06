@@ -31,4 +31,4 @@ class Line(models.Model):
     prof_name = models.ForeignKey(Professor, to_field='prof_name')
 
     def __str__(self):
-        return str(self.position) + " - " + str(self.prof_name) + " : " + str(self.student_name)
+        return "{} : {}".format(str(self.prof_name), str(self.student_name))
