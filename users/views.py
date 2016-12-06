@@ -112,6 +112,11 @@ def delete_from_list(request, prof, student):
 
     # Remove student from the queue.
     Line.objects.filter(student_name=student, prof_name=prof).delete()
-    Student.objects.filter(student_name=student).delete()
-    Professor.objects.filter(prof_name=prof).delete()
+
+    if Line.objects.filter(student_name=student).count() == 0:
+        Student.objects.filter(student_name=student).delete()
+
+    if Line.objects.filter(prof_name=prof).count() == 0:
+        Professor.objects.filter(prof_name=prof).delete()
+
     return JsonResponse({'students': get_student_list(prof)})
