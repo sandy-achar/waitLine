@@ -102,7 +102,7 @@ def add_to_list(request, prof, student, id):
         add_to_line = Line(student_name=idiot_student, prof_name=prof_name)
         add_to_line.save()
 
-        return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
+    return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
 
 
 def delete_from_list(request, prof, student):
@@ -121,4 +121,4 @@ def delete_from_list(request, prof, student):
     if Line.objects.filter(prof_name=prof).count() == 0:
         Professor.objects.filter(prof_name=prof).delete()
 
-        return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
+    return JsonResponse({'Professors': prof, 'Students': get_student_list(prof)})
