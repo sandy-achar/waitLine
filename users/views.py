@@ -34,7 +34,7 @@ def professors(request):
     Return a list of all the professors in the system currently.
     :return: List of all the professors.
     """
-    return JsonResponse({'professor': get_prof_list()})
+    return JsonResponse({'Professors': get_prof_list()})
 
 
 def health_check(request):
